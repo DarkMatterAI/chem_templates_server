@@ -4,4 +4,6 @@ pydantic-settings
 orjson
 motor
 beanie
+pytest
+httpx
 chem_templates

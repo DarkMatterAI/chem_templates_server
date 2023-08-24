@@ -18,6 +18,7 @@ def strip_template_api(template_config: schemas.TemplateConfig):
     return crud.strip_template_crud(template_config)
 
 @router.post("/eval_template_functional", response_model=list[schemas.TemplateEvalResponse])
-def eval_template_functional_api(eval_request: schemas.TemplateEvalRequestFunctional, return_data: bool=True):
-    return crud.eval_template_functional(eval_request, return_data)
+async def eval_template_functional_api(eval_request: schemas.TemplateEvalRequestFunctional, return_data: bool=True):
+    results = await crud.eval_template_functional(eval_request, return_data)
+    return results
 

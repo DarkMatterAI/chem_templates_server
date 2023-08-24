@@ -10,9 +10,16 @@ docker run -d --name test_stateful -p 7861:7861 -e PORT="7861" -e WORKERS="32" -
 
 docker run -d --name test -p 7861:7861 -e PORT="7861" -e WORKERS="32" chem_templates_server
 
-uvicorn app.main:app --host 0.0.0.0 --port 7861 --workers 1 --timeout-keep-alive 120 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 7861 --workers 1 --timeout-keep-alive 120
 
 
 todos
     tests
     docker compose
+
+tests
+    mongo test toggle
+    mongo api tests
+    crud tests
+    chem tests
+
