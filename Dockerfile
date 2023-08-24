@@ -12,5 +12,7 @@ ENV PORT=7860
 ENV HOST=0.0.0.0
 ENV WORKERS=1
 ENV TIMEOUT=120
+ENV MONGO_URI=
+ENV MONGO_DB_NAME=template_db
 
 CMD uvicorn app.main:app --host $HOST --port $PORT --workers $WORKERS --timeout-keep-alive $TIMEOUT

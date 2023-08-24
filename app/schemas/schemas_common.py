@@ -1,22 +1,5 @@
 from typing import Union, Optional
-
 from pydantic import BaseModel
-
-class ComputePropertiesRequest(BaseModel):
-    queries: list[str]
-    property_names: Optional[list[str]]
-
-class ComputePropertiesResponse(BaseModel):
-    results: list[dict]
-
-class ComputeCatalogRequest(BaseModel):
-    queries: list[str]
-    catalog_names: Optional[list[str]]
-
-class ComputeCatalogResponse(BaseModel):
-    results: list[dict]
-
-
 
 class FilterRange(BaseModel):
     min_val: Optional[Union[float, int]]
@@ -29,15 +12,11 @@ class SmartsFilters(BaseModel):
     property_filters: dict[str, FilterRange]
 
 class TemplateConfig(BaseModel):
+    template_name: Optional[str]
     property_filters: dict[str, FilterRange]
     catalog_filters: dict[str, IncludeCatalog]
     smarts_filters: dict[str, FilterRange]
 
-
-
-class TemplateEvalRequest(BaseModel):
-    queries: list[str]
-    template_config: TemplateConfig
 
 class PropertyResult(BaseModel):
     min_val: Optional[Union[float, int]]
@@ -56,13 +35,16 @@ class SmartsResult(BaseModel):
     max_val: Optional[Union[float, int]]
     result: bool 
 
-class TemplateEvalResponse(BaseModel):
-    input: str
-    result: bool
-
-class TemplateEvalResponseVerbose(TemplateEvalResponse):
+class TemplateResponseData(BaseModel):
+    template_name: Optional[str]
     valid_input: bool
     property_filters: dict[str, PropertyResult]
     catalog_filters: dict[str, CatalogResult]
     smarts_filters: dict[str, SmartsResult]
+
+class TemplateEvalResponse(BaseModel):
+    input: str 
+    result: bool
+    template_data: Optional[TemplateResponseData]
+    
 

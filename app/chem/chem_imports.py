@@ -240,6 +240,7 @@ FILTER_DESCRIPTIONS = {
 
 
 BASE_TEMPLATE = {
+    'template_name' : None,
     'property_filters' : {
                         "Number of Compounds" :             {'min_val' : None, 'max_val' : None},
                         "TPSA" :                            {'min_val' : None, 'max_val' : None},

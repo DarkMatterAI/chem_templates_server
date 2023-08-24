@@ -1,4 +1,7 @@
 fastapi
 uvicorn[standard]
+pydantic-settings
 orjson
+motor
+beanie
 chem_templates
