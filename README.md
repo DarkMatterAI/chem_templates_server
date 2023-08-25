@@ -12,14 +12,6 @@ docker run -d --name test -p 7861:7861 -e PORT="7861" -e WORKERS="32" chem_templ
 
 uvicorn app.main:app --host 0.0.0.0 --port 7861 --workers 1 --timeout-keep-alive 120
 
+docker exec -it {container_id} app/tests/tests-start.sh
 
-todos
-    tests
-    docker compose
-
-tests
-    mongo test toggle
-    mongo api tests
-    crud tests
-    chem tests
-
+docker-compose exec template_server app/tests/tests-start.sh

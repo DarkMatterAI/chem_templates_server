@@ -141,8 +141,13 @@ def _delete_helper(template_id, client):
     response = client.delete(f"/delete_template/{template_id}")
     assert response.status_code == 200
 
+def _skip_mongo():
+    mongo_uri = os.environ.get('MONGO_URI', None)
+    if (mongo_uri==None) or (mongo_uri==''):
+        return True 
+    return False 
 
-# @pytest.mark.skipif(os.environ.get('MONGO_URI', None) is None, reason="mongodb connection not detected")
+@pytest.mark.skipif(_skip_mongo(), reason="mongodb connection not detected")
 def test_stateful_api(client: TestClient):
     
     # create
@@ -159,7 +164,7 @@ def test_stateful_api(client: TestClient):
     _delete_helper(template_id, client)
 
 
-# @pytest.mark.skipif(os.environ.get('MONGO_URI', None) is None, reason="mongodb connection not detected")
+@pytest.mark.skipif(_skip_mongo(), reason="mongodb connection not detected")
 def test_eval_template_stateful_no_data(client: TestClient):
     template_id = _create_helper(test_eval_template, client)
 
@@ -171,7 +176,7 @@ def test_eval_template_stateful_no_data(client: TestClient):
 
     _delete_helper(template_id, client)
 
-# @pytest.mark.skipif(os.environ.get('MONGO_URI', None) is None, reason="mongodb connection not detected")
+@pytest.mark.skipif(_skip_mongo(), reason="mongodb connection not detected")
 def test_eval_template_stateful_data(client: TestClient):
     template_id = _create_helper(test_eval_template, client)
 
