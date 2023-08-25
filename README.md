@@ -15,3 +15,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 7861 --workers 1 --timeout-keep-alive
 docker exec -it {container_id} app/tests/tests-start.sh
 
 docker-compose exec template_server app/tests/tests-start.sh
+
+todos:
+    readme
+        build instructions
+    api docs
+    docker up overview docs

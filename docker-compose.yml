@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   template_server:
-    build: .
+    image: dmaichem/chem_templates_server
     ports:
       - 7861:7861
     environment:
