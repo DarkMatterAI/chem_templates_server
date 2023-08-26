@@ -291,3 +291,42 @@ BASE_TEMPLATE = {
                         'example_smarts' : {'min_val' : None, 'max_val' : None},
                         }
 }
+
+
+BUILDING_BLOCK_TEMPLATE = {
+                            'template_config' : BASE_TEMPLATE
+                            }
+
+PRODUCT_TEMPLATE = {
+                    'reaction_mechanisms' : {
+                                                'O-acylation' : True,
+                                                'Olefination' : True,
+                                                'Condensation_of_Y-NH2_with_carbonyl_compounds' : True,
+                                                'Amine_sulphoacylation' : True,
+                                                'C-C couplings' : True,
+                                                'Radical_reactions' : True,
+                                                'N-acylation' : True,
+                                                'O-alkylation_arylation' : True,
+                                                'Metal organics C-C bong assembling' : True,
+                                                'S-alkylation_arylation' : True,
+                                                'Alkylation_arylation_of_NH-lactam' : True,
+                                                'Alkylation_arylation_of_NH-heterocycles' : True,
+                                                'Amine_alkylation_arylation' : True
+                                            },
+                    'template_config' : BASE_TEMPLATE
+                    }
+
+ASSEMBLY_SCHEMA_2BB = {
+                        'building_block_1' : BUILDING_BLOCK_TEMPLATE,
+                        'building_block_2' : BUILDING_BLOCK_TEMPLATE,
+                        'product' : PRODUCT_TEMPLATE
+                        }
+
+ASSEMBLY_SCHEMA_3BB = {
+                        'building_block_1' : BUILDING_BLOCK_TEMPLATE,
+                        'building_block_2' : BUILDING_BLOCK_TEMPLATE,
+                        'intermediate_product_1' : PRODUCT_TEMPLATE,
+                        'building_block_3' : BUILDING_BLOCK_TEMPLATE,
+                        'product' : PRODUCT_TEMPLATE
+                        }
+
