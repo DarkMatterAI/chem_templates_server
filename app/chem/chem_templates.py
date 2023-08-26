@@ -123,10 +123,11 @@ def build_filters(template_config):
     filters += build_smarts_filters(template_config['smarts_filters'])
     return filters 
 
-def eval_query(query, filters, template_name, return_data=False):
+def eval_query(query, index, filters, template_name, return_data=False):
 
     output = {
         'input' : query,
+        'index' : index,
         'result' : True,
     }
 
@@ -165,18 +166,28 @@ def eval_query(query, filters, template_name, return_data=False):
 
     return output 
 
-def run_request(queries, template_config, return_data=False):
+def run_request(inputs, template_config, return_data=False):
     start = time.time()
-    print(f'starting eval of {len(queries)} queries')
+    print(f'starting eval of {len(inputs)} inputs')
 
     filters = build_filters(template_config)
 
-    results = [
-                eval_query(i, filters, template_config['template_name'], return_data=return_data) 
-                for i in queries
-                ]
+    results = []
+
+    for index, input in enumerate(inputs):
+        result = eval_query(input, 
+                            index, 
+                            filters, 
+                            template_config['template_name'], 
+                            return_data=return_data)
+        results.append(result)
+
+    # results = [
+    #             eval_query(i, filters, template_config['template_name'], return_data=return_data) 
+    #             for i in inputs
+    #             ]
 
     elapsed = time.time() - start 
-    print(f'finished eval of {len(queries)} queries in {elapsed} seconds')
+    print(f'finished eval of {len(inputs)} inputs in {elapsed} seconds')
     return results 
 

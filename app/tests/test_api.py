@@ -54,12 +54,14 @@ test_eval_template_update = {
 test_smiles = test_smiles = ['COC(=O)CCCNC(=O)Nc1cccc(Oc2ccccc2)c1', 'CCC', 'c']
 
 test_eval_template_results_no_data = [{'input': 'COC(=O)CCCNC(=O)Nc1cccc(Oc2ccccc2)c1',
+                                        'index' : 0,
                                         'result': False,
                                         'template_data': None},
-                                        {'input': 'CCC', 'result': True, 'template_data': None},
-                                        {'input': 'c', 'result': False, 'template_data': None}]
+                                        {'input': 'CCC', 'index' : 1, 'result': True, 'template_data': None},
+                                        {'input': 'c', 'index' : 2, 'result': False, 'template_data': None}]
 
 test_eval_template_results_data = [{'input': 'COC(=O)CCCNC(=O)Nc1cccc(Oc2ccccc2)c1',
+                                    'index' : 0,
                                     'result': False,
                                     'template_data': {'template_name': 'test',
                                     'valid_input': True,
@@ -70,6 +72,7 @@ test_eval_template_results_data = [{'input': 'COC(=O)CCCNC(=O)Nc1cccc(Oc2ccccc2)
                                     'catalog_filters': {},
                                     'smarts_filters': {}}},
                                     {'input': 'CCC',
+                                    'index' : 1,
                                     'result': True,
                                     'template_data': {'template_name': 'test',
                                     'valid_input': True,
@@ -80,6 +83,7 @@ test_eval_template_results_data = [{'input': 'COC(=O)CCCNC(=O)Nc1cccc(Oc2ccccc2)
                                     'catalog_filters': {},
                                     'smarts_filters': {}}},
                                     {'input': 'c',
+                                    'index' : 2,
                                     'result': False,
                                     'template_data': {'template_name': 'test',
                                     'valid_input': False,
@@ -104,14 +108,14 @@ def test_strip_template(client: TestClient):
 
 def test_eval_template_functional_no_data(client: TestClient):
     response = client.post('eval_template_functional', 
-                            json={'queries' : test_smiles, 'template_config' : test_eval_template},
+                            json={'inputs' : test_smiles, 'template_config' : test_eval_template},
                             params={'return_data':False})
     assert response.status_code == 200
     assert response.json() == test_eval_template_results_no_data
 
 def test_eval_template_functional_data(client: TestClient):
     response = client.post('eval_template_functional', 
-                            json={'queries' : test_smiles, 'template_config' : test_eval_template},
+                            json={'inputs' : test_smiles, 'template_config' : test_eval_template},
                             params={'return_data':True})
     assert response.status_code == 200
     assert response.json() == test_eval_template_results_data
@@ -169,7 +173,7 @@ def test_eval_template_stateful_no_data(client: TestClient):
     template_id = _create_helper(test_eval_template, client)
 
     response = client.post(f"/eval_template_stateful/{template_id}",
-                            json={'queries':test_smiles}, params={'return_data':False})
+                            json={'inputs':test_smiles}, params={'return_data':False})
 
     assert response.status_code == 200
     assert response.json() == test_eval_template_results_no_data
@@ -181,7 +185,7 @@ def test_eval_template_stateful_data(client: TestClient):
     template_id = _create_helper(test_eval_template, client)
 
     response = client.post(f"/eval_template_stateful/{template_id}",
-                            json={'queries':test_smiles}, params={'return_data':True})
+                            json={'inputs':test_smiles}, params={'return_data':True})
 
     assert response.status_code == 200
     assert response.json() == test_eval_template_results_data

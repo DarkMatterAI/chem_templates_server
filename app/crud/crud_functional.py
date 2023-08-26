@@ -14,10 +14,10 @@ def strip_template_crud(template_config: schemas.TemplateConfig):
 
 async def eval_template_functional(eval_request: schemas.TemplateEvalRequestFunctional, return_data: bool):
 
-    queries = eval_request.queries
+    inputs = eval_request.inputs
     template_config = eval_request.template_config.dict()
 
-    results = chem_templates.run_request(queries, template_config, return_data=return_data)
+    results = chem_templates.run_request(inputs, template_config, return_data=return_data)
     
     await asyncio.sleep(0.01)
 

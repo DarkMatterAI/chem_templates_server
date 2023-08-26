@@ -44,6 +44,7 @@ class TemplateResponseData(BaseModel):
 
 class TemplateEvalResponse(BaseModel):
     input: str 
+    index: int
     result: bool
     template_data: Optional[TemplateResponseData]
     

@@ -14,4 +14,4 @@ class TemplateDocument(Document):
     template_config: TemplateConfig
 
 class EvalRequestStateful(BaseModel):
-    queries: list[str]
+    inputs: list[str]

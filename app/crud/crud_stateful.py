@@ -46,9 +46,9 @@ async def delete_template(template_id: str):
 async def eval_template_stateful(template_id: str, eval_request: schemas.EvalRequestStateful, return_data: bool=True):
     item = await get_template(template_id)
 
-    queries = eval_request.queries
+    inputs = eval_request.inputs
     template_config = item.template_config.dict()
 
-    results = chem_templates.run_request(queries, template_config, return_data=return_data)
+    results = chem_templates.run_request(inputs, template_config, return_data=return_data)
 
     return results 

@@ -9,5 +9,5 @@ from .schemas_common import (
                             )
 
 class TemplateEvalRequestFunctional(BaseModel):
-    queries: list[str]
+    inputs: list[str]
     template_config: TemplateConfig

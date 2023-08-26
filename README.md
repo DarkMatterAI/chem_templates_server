@@ -17,14 +17,12 @@ cd chem_templates_server
 docker-compose up -d --build
 ```
 
-The service is now running at port 7861
+The service is now running at port 7861, with API docs at `http://localhost:7861/docs`
 
+# Docs
 
+View the [docs](https://github.com/DarkMatterAI/chem_templates_server/tree/main/docs) directory for
 
-todos:
-    readme
-        reduce to docker compose install for brevity
-    docs
-        installation
-            more detailed instal info
-        api docs
+- [Setup](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/01%20setup.md)
+- [API docs](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/02%20usage.md)
+
