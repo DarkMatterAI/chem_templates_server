@@ -7,44 +7,7 @@ instance to enable CRUD operations and persistent storage of template schemas
 
 # Quickstart
 
-## Standalone Service
-
-The standalone service is available on Docker Hub
-
-```
-docker pull dmaichem/chem_templates_server
-
-docker run -d \
-     -p $PORT:$PORT \
-     -e PORT=$PORT \
-     -e HOST=$HOST \
-     -e WORKERS=$WORKERS \
-     -e TIMEOUT=$TIMEOUT \
-     dmaichem/chem_templates_server
-```
-
-To build from source
-
-```
-git clone https://github.com/DarkMatterAI/chem_templates_server
-
-cd chem_templates_server
-
-docker build -t chem_templates_server .
-
-docker run -d \
-     -p $PORT:$PORT \
-     -e PORT=$PORT \
-     -e HOST=$HOST \
-     -e WORKERS=$WORKERS \
-     -e TIMEOUT=$TIMEOUT \
-     chem_templates_server
-```
-
-## Stateful Service with MongoDB Connection
-
-The easiest way to start the stateful service is to use the supplied `docker-compose.yml`. This 
-will build the `chem_templates_server` container and a MongoDB container.
+To start, clone the repo and build with `docker-compose`.
 
 ```
 git clone https://github.com/DarkMatterAI/chem_templates_server
@@ -54,36 +17,14 @@ cd chem_templates_server
 docker-compose up -d --build
 ```
 
-```
-docker pull dmaichem/chem_templates_server
+The service is now running at port 7861
 
-docker run -d \
-     -p $PORT:$PORT \
-     -e PORT=$PORT \
-     -e HOST=$HOST \
-     -e WORKERS=$WORKERS \
-     -e TIMEOUT=$TIMEOUT \
-     -e MONGO_URI=$MONGO_URI \
-     -e MONGO_DB_NAME=$MONGO_DB_NAME \
-     dmaichem/chem_templates_server
-```
 
-## Test Build
-
-To test the build, run 
-
-```
-docker exec -it {container_id} app/tests/tests-start.sh
-```
-
-or, if you used `docker-compose`
-
-```
-docker-compose exec template_server app/tests/tests-start.sh
-```
 
 todos:
     readme
-        build instructions
-    api docs
-    docker up overview docs
+        reduce to docker compose install for brevity
+    docs
+        installation
+            more detailed instal info
+        api docs
