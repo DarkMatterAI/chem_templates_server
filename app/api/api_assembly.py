@@ -20,28 +20,27 @@ def bb_description_api():
 def get_rxn_mechanisms_api():
     return crud.get_rxn_mechanisms()
 
-@router.post('/building_block/2bb_assembly')
+@router.post('/building_block/2bb_assembly', response_model=list[dict])
 async def assemble_2bbs_api(assembly_inputs: schemas.TwoBBAseemblyRequest):
     results = await crud.assemble_2bbs(assembly_inputs)
     return results
 
-@router.post('/building_block/3bb_assembly')
+@router.post('/building_block/3bb_assembly', response_model=list[dict])
 async def assemble_2bbs_api(assembly_inputs: schemas.ThreeBBAseemblyRequest):
     results = await crud.assemble_3bbs(assembly_inputs)
     return results
 
-@router.post('/building_block/custom_assembly')
+@router.post('/building_block/custom_assembly', response_model=list[dict])
 async def assemble_bb_custom_api(assembly_inputs: schemas.CustomAssemblySchema):
-    results = await crud.assemble_bb_custom(assembly_inputs)
+    results = await crud.assemble_custom(assembly_inputs, 'synthon')
     return results
-
 
 @router.get('/fragment/description')
 def frag_description_api():
     return crud.frag_description()
 
-@router.post('/fragment/custom_assembly')
+@router.post('/fragment/custom_assembly', response_model=list[dict])
 async def assemble_frag_custom_api(assembly_inputs: schemas.CustomAssemblySchema):
-    results = await crud.assemble_frag_custom(assembly_inputs)
+    results = await crud.assemble_custom(assembly_inputs, 'fragment')
     return results
 

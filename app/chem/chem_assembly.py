@@ -4,6 +4,7 @@ from chem_templates.building_blocks import (
                                             smile_to_synthon,
                                             REACTION_GROUP_NAMES
                                             )
+from collections import defaultdict 
 
 ASSEMBLY_TYPE_CONFIG = {
     'synthon' : {
@@ -14,6 +15,16 @@ ASSEMBLY_TYPE_CONFIG = {
                     'assembly_pool' : AssemblyPool,
                     'assembly_schema_function' : build_fragment_assembly_scheme
                 }
+}
+
+
+SCHEMA_REMAPPING_FUNCTIONS = {
+    'template_config' : lambda k,v: ('template', config_to_template(v)),
+    'n_func' : lambda k,v: (k, set(v)),
+    'reaction_mechanisms' : lambda k,v: ('rxn_universe', config_to_rxn_universe(v)),
+    'incoming_node' : lambda k,v: (k, convert_assembly_schema(v)),
+    'next_node' : lambda k,v: (k, convert_assembly_schema(v)),
+    'children' : lambda k,v: (k, [convert_assembly_schema(i) for i in v])
 }
 
 def compute_synthons(inputs):
@@ -53,7 +64,6 @@ def config_to_rxn_universe(rxn_mechanism_dict):
     rxn_universe = ReactionUniverse('reactions', reaction_mechanisms)
     return rxn_universe 
 
-
 def process_inputs(inputs, assembly_type):
     inputs = [Molecule(i['input'], data=i['data']) for i in inputs]
 
@@ -68,24 +78,43 @@ def process_inputs(inputs, assembly_type):
 def convert_assembly_schema(node_dict):
     new_node_dict = {}
     for k,v in node_dict.items():
-        if k=='template_config':
-            new_node_dict['template'] = config_to_template(v)
-        elif k=='n_func':
-            new_node_dict[k] = set(v)
-        elif k=='reaction_mechanisms':
-            new_node_dict['rxn_universe'] = config_to_rxn_universe(v)
-        elif (k=='incoming_node') or (k=='next_node'):
-            new_node_dict[k] = convert_assembly_schema(v)
-        elif k=='children':
-            new_node_dict[k] = [convert_assembly_schema(i) for i in v]
-        else:
-            new_node_dict[k] = v 
-
+        convert_func = SCHEMA_REMAPPING_FUNCTIONS.get(k, lambda k,v: (k,v))
+        new_k, new_v = convert_func(k,v)
+        new_node_dict[new_k] = new_v 
     return new_node_dict 
 
-def run_assembly(assembly_schema, input_dict, assembly_type):
+def build_assembly_inputs(assembly_schema, mapped_inputs, unmapped_inputs, assembly_type):
+    input_dict1 = {}
+    input_dict2 = {}
+    if mapped_inputs:
+        for k,v in mapped_inputs.items():
+            input_dict1[k] = process_inputs(v, assembly_type)
+
+    if unmapped_inputs:
+        unmapped_inputs = process_inputs(unmapped_inputs, assembly_type)
+        input_dict2 = assembly_schema.build_assembly_pools(unmapped_inputs)
+
+    merge_dict = defaultdict(list)
+    for input_dict in [input_dict1, input_dict2]:
+        for k,v in input_dict.items():
+            merge_dict[k] += v.items
+
+    input_dict = {k : ASSEMBLY_TYPE_CONFIG[assembly_type]['assembly_pool'](v) for k,v in merge_dict.items()}
 
     assembly_inputs = AssemblyInputs(input_dict, 1000, 1e6, log=False)
+
+    return assembly_inputs 
+
+def assemble_inputs(assembly_input_dict, assembly_type):
+    assembly_schema = assembly_input_dict['assembly_schema']
+    mapped_inputs = assembly_input_dict['mapped_inputs']
+    unmapped_inputs = assembly_input_dict['unmapped_inputs']
+
+    assembly_schema_dict = convert_assembly_schema(assembly_schema)
+
+    assembly_schema = build_assembly_from_dict(assembly_schema_dict)
+
+    assembly_inputs = build_assembly_inputs(assembly_schema, mapped_inputs, unmapped_inputs, assembly_type)
 
     assembled = assembly_schema.assemble(assembly_inputs)
 
@@ -96,20 +125,6 @@ def run_assembly(assembly_schema, input_dict, assembly_type):
         outputs = sorted(outputs, key=lambda x: x['result'])
 
     return outputs 
-
-def assemble_inputs(assembly_input_dict, assembly_type):
-    assembly_schema = assembly_input_dict['assembly_schema']
-    mapped_inputs = assembly_input_dict['mapped_inputs']
-
-    assembly_schema_dict = convert_assembly_schema(assembly_schema)
-
-    assembly_schema = build_assembly_from_dict(assembly_schema_dict)
-
-    input_dict = {}
-    for k,v in mapped_inputs.items():
-        input_dict[k] = process_inputs(v, assembly_type)
-
-    return run_assembly(assembly_schema, input_dict, assembly_type)
 
 def get_bb_leaf_node_schema(assembly_inputs, name, n_func):
     node_schema = assembly_inputs[name]
@@ -133,11 +148,18 @@ def get_bb_product_node_schema(assembly_inputs, name, n_func, incoming_node, nex
 def get_mapped_inputs(assembly_inputs):
     mapped_inputs = {}
     for k,v in assembly_inputs.items():
-        if type(v)==dict:
-            inputs = v.get('inputs', None)
-            if inputs:
-                mapped_inputs[k] = inputs 
+        inputs = v.get('inputs', None)
+        if inputs:
+            mapped_inputs[k] = inputs 
     return mapped_inputs
+
+def build_assembly_input_dict(assembly_inputs, assembly_schema):
+    unmapped_inputs = assembly_inputs.pop('unmapped_inputs')
+    mapped_inputs = get_mapped_inputs(assembly_inputs)
+    assembly_input_dict = {'assembly_schema' : assembly_schema, 
+                            'mapped_inputs' : mapped_inputs,
+                            'unmapped_inputs' : unmapped_inputs}
+    return assembly_input_dict
 
 def assemble_2bbs(assembly_inputs):
 
@@ -145,9 +167,7 @@ def assemble_2bbs(assembly_inputs):
     block2 = get_bb_leaf_node_schema(assembly_inputs, 'building_block_2', [1])
     product = get_bb_product_node_schema(assembly_inputs, 'product', [0], block1, block2)
 
-    mapped_inputs = get_mapped_inputs(assembly_inputs)
-
-    assembly_input_dict = {'assembly_schema' : product, 'mapped_inputs' : mapped_inputs}
+    assembly_input_dict = build_assembly_input_dict(assembly_inputs, product)
 
     return assemble_inputs(assembly_input_dict, 'synthon')
 
@@ -159,8 +179,6 @@ def assemble_3bbs(assembly_inputs):
     block3 = get_bb_leaf_node_schema(assembly_inputs, 'building_block_3', [1])
     product = get_bb_product_node_schema(assembly_inputs, 'product', [0], ip1, block3)
 
-    mapped_inputs = get_mapped_inputs(assembly_inputs)
-
-    assembly_input_dict = {'assembly_schema' : product, 'mapped_inputs' : mapped_inputs}
+    assembly_input_dict = build_assembly_input_dict(assembly_inputs, product)
 
     return assemble_inputs(assembly_input_dict, 'synthon')

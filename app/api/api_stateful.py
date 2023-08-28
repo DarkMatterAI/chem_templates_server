@@ -39,3 +39,26 @@ async def eval_template_stateful_api(template_id: str, eval_request: schemas.Eva
     results = await crud.eval_template_stateful(template_id, eval_request, return_data)
     return results
 
+@router.post("/building_block/2bb_assembly_stateful", response_model=list[dict])
+async def assemble_2bbs_stateful_api(assembly_inputs: schemas.TwoBBAseemblyRequest):
+    results = await crud.assemble_2bbs_stateful(assembly_inputs)
+    return results
+
+@router.post("/building_block/3bb_assembly_stateful", response_model=list[dict])
+async def assemble_3bbs_stateful_api(assembly_inputs: schemas.ThreeBBAseemblyRequest):
+    results = await crud.assemble_3bbs_stateful(assembly_inputs)
+    return results
+
+@router.post('/building_block/custom_assembly_stateful', response_model=list[dict])
+async def assemble_bb_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchema):
+    results = await crud.assemble_bb_custom_stateful(assembly_inputs, 'synthon')
+    return results
+
+@router.post('/fragment/custom_assembly_stateful', response_model=list[dict])
+async def assemble_frag_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchema):
+    results = await crud.assemble_frag_custom_stateful(assembly_inputs, 'fragment')
+    return results
+
+
+
+

@@ -31,22 +31,10 @@ async def assemble_3bbs(assembly_inputs: schemas.ThreeBBAseemblyRequest):
     await asyncio.sleep(0.01)
     return results 
 
-async def assemble_bb_custom(assembly_inputs: schemas.CustomAssemblySchema):
-
-    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), 'synthon')
+async def assemble_custom(assembly_inputs: schemas.CustomAssemblySchema, assembly_type):
+    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), assembly_type)
     await asyncio.sleep(0.01)
     return results 
-
-async def assemble_frag_custom(assembly_inputs: schemas.CustomAssemblySchema):
-
-    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), 'fragment')
-    await asyncio.sleep(0.01)
-    return results 
-
-
 
 def frag_description():
     return chem_assembly.FRAGMENT_ASSEMBLY_DESCRIPTION
-
-
-
