@@ -24,12 +24,10 @@ class AssemblyInputItem(BaseModel):
 class AssemblyLeafNodeInputs(BaseModel):
     inputs: list[AssemblyInputItem]
     template_config: Optional[TemplateConfig]
-    template_id: Optional[str]
 
 class ReactionNodeInputs(BaseModel):
     reaction_mechanisms: dict[str, bool]
     template_config: Optional[TemplateConfig]
-    template_id: Optional[str]
 
 class TwoBBAseemblyRequest(BaseModel):
     building_block_1: AssemblyLeafNodeInputs

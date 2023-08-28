@@ -9,6 +9,8 @@ router = APIRouter(default_response_class=responses.ORJSONResponse)
 async def init_db():
     await crud.init_mongodb()
 
+##### templates 
+
 @router.post("/create_template", response_model=schemas.TemplateDocument)
 async def create_template_api(template_config: schemas.TemplateConfig):
     item = await crud.create_template(template_config)
@@ -39,24 +41,52 @@ async def eval_template_stateful_api(template_id: str, eval_request: schemas.Eva
     results = await crud.eval_template_stateful(template_id, eval_request, return_data)
     return results
 
+
+##### assembly 
+
+@router.post("/create_assembly_schema", response_model=schemas.AssemblySchemaDocument)
+async def create_assembly_schema_api(assembly_schema: schemas.CreateAssemblySchema):
+    item = await crud.create_assembly_schema(assembly_schema)
+    return item 
+
+@router.get("/get_assembly_schema/{assembly_schema_id}", response_model=schemas.AssemblySchemaDocument)
+async def get_assembly_schema_api(assembly_schema_id: str):
+    item = await crud.get_assembly_schema(assembly_schema_id)
+    return item 
+
+@router.get("/scroll_assembly_schema", response_model=list[schemas.AssemblySchemaDocument])
+async def scroll_assembly_schema_api(skip: int=0, limit: int=100):
+    items = await crud.scroll_assembly_schema(skip, limit)
+    return items 
+
+@router.post("/update_assembly_schema/{assembly_schema_id}", response_model=schemas.AssemblySchemaDocument)
+async def update_assembly_schema_api(assembly_schema_id: str, assembly_schema: schemas.CreateAssemblySchema):
+    item = await crud.update_assembly_schema(assembly_schema_id, assembly_schema)
+    return item 
+
+@router.delete("/delete_assembly_schema/{assembly_schema_id}")
+async def delete_assembly_schema_api(assembly_schema_id: str):
+    result = await crud.delete_assembly_schema(assembly_schema_id)
+    return result
+
 @router.post("/building_block/2bb_assembly_stateful", response_model=list[dict])
-async def assemble_2bbs_stateful_api(assembly_inputs: schemas.TwoBBAseemblyRequest):
+async def assemble_2bbs_stateful_api(assembly_inputs: schemas.TwoBBAseemblyRequestStateful):
     results = await crud.assemble_2bbs_stateful(assembly_inputs)
     return results
 
 @router.post("/building_block/3bb_assembly_stateful", response_model=list[dict])
-async def assemble_3bbs_stateful_api(assembly_inputs: schemas.ThreeBBAseemblyRequest):
+async def assemble_3bbs_stateful_api(assembly_inputs: schemas.ThreeBBAseemblyRequestStateful):
     results = await crud.assemble_3bbs_stateful(assembly_inputs)
     return results
 
 @router.post('/building_block/custom_assembly_stateful', response_model=list[dict])
-async def assemble_bb_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchema):
-    results = await crud.assemble_bb_custom_stateful(assembly_inputs, 'synthon')
+async def assemble_bb_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchemaStateful):
+    results = await crud.assemble_custom_stateful(assembly_inputs, 'synthon')
     return results
 
 @router.post('/fragment/custom_assembly_stateful', response_model=list[dict])
-async def assemble_frag_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchema):
-    results = await crud.assemble_frag_custom_stateful(assembly_inputs, 'fragment')
+async def assemble_frag_custom_stateful_api(assembly_inputs: schemas.CustomAssemblySchemaStateful):
+    results = await crud.assemble_custom_stateful(assembly_inputs, 'fragment')
     return results
 
 
