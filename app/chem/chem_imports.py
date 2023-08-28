@@ -12,7 +12,14 @@ from chem_templates.filter import Filter, RangeFunctionFilter, CatalogFilter, Fi
 from chem_templates.chem import Molecule, Catalog
 from chem_templates.utils import flatten_list, deduplicate_list
 from chem_templates.building_blocks import REACTION_GROUP_DICT, Synthon, molecule_to_synthon, ReactionUniverse 
-from chem_templates.assembly import build_assembly_from_dict, AssemblyInputs, SynthonPool, build_synthesis_scheme
+from chem_templates.assembly import (
+                                    build_assembly_from_dict, 
+                                    AssemblyInputs, 
+                                    SynthonPool, 
+                                    AssemblyPool,
+                                    build_synthesis_scheme, 
+                                    build_fragment_assembly_scheme
+                                    )
 
 def to_mol(smile):
     try:
@@ -427,8 +434,8 @@ product = {
 
 BUILDING_BLOCK_ASSEMBLY_DESCRIPTION = {
     'overview' : bb_assembly_overview,
-    'synthon_leaf_node' : SYNTHON_LEAF_NODE_SCHEMA,
-    'synthon_node' : SYNTHON_NODE_SCHEMA
+    'leaf_node_schema' : SYNTHON_LEAF_NODE_SCHEMA,
+    'node_schema' : SYNTHON_NODE_SCHEMA
 }
 
 
@@ -499,7 +506,7 @@ fused_molecule = {
 
 FRAGMENT_ASSEMBLY_DESCRIPTION = {
     'overview' : fragment_assembly_overview,
-    'synthon_leaf_node' : FRAGMENT_LEAF_NODE_SCHEMA,
-    'synthon_node' : FRAGMENT_NODE_SCHEMA
+    'leaf_node_schema' : FRAGMENT_LEAF_NODE_SCHEMA,
+    'node_schema' : FRAGMENT_NODE_SCHEMA
 }
 

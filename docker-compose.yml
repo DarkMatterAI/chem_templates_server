@@ -10,7 +10,7 @@ services:
     environment:
       - PORT=7861
       - HOST=0.0.0.0
-      - WORKERS=1
+      - WORKERS=32
       - TIMEOUT=120
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=template_db

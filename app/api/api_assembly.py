@@ -36,22 +36,12 @@ async def assemble_bb_custom_api(assembly_inputs: schemas.CustomAssemblySchema):
     return results
 
 
-
 @router.get('/fragment/description')
 def frag_description_api():
     return crud.frag_description()
 
+@router.post('/fragment/custom_assembly')
+async def assemble_frag_custom_api(assembly_inputs: schemas.CustomAssemblySchema):
+    results = await crud.assemble_frag_custom(assembly_inputs)
+    return results
 
-
-
-# @router.get("/base_assembly_schema_2bb", response_model=schemas.AssemblySchema2BB)
-# def get_base_assembly_schema_api():
-#     return crud.get_base_assembly_schema('2bb')
-
-# @router.get("/base_assembly_schema_3bb", response_model=schemas.AssemblySchema3BB)
-# def get_base_assembly_schema_api():
-#     return crud.get_base_assembly_schema('3bb')
-
-# @router.post("/strip_assembly_schema", response_model=schemas.AssemblySchema2BB)
-# def strip_assembly_schema_api(assembly_schema: Union[schemas.AssemblySchema2BB, schemas.AssemblySchema3BB]):
-#     return crud.strip_assembly_schema_crud(assembly_schema)

@@ -66,7 +66,7 @@ Example of how to send queries to the server with the python `requests` library.
 
 ```python
 import requests
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 def send_filter_request(inputs, template_config, return_data=True):
@@ -83,7 +83,7 @@ def send_filter_request_parallel(inputs, template_config, batch_size, n_concurre
     
     input_batches = [inputs[i:i+batch_size] for i in range(0, len(inputs), batch_size)]
     
-    with ThreadPool(n_concurrent) as p:
+    with ThreadPoolExecutor(n_concurrent) as p:
         func = partial(send_filter_request, template_config=template_config, return_data=return_data)
         results = p.map(func, input_batches)
         

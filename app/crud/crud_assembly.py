@@ -33,7 +33,13 @@ async def assemble_3bbs(assembly_inputs: schemas.ThreeBBAseemblyRequest):
 
 async def assemble_bb_custom(assembly_inputs: schemas.CustomAssemblySchema):
 
-    results = chem_assembly.assemble_bb_custom(assembly_inputs.dict())
+    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), 'synthon')
+    await asyncio.sleep(0.01)
+    return results 
+
+async def assemble_frag_custom(assembly_inputs: schemas.CustomAssemblySchema):
+
+    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), 'fragment')
     await asyncio.sleep(0.01)
     return results 
 
@@ -41,27 +47,6 @@ async def assemble_bb_custom(assembly_inputs: schemas.CustomAssemblySchema):
 
 def frag_description():
     return chem_assembly.FRAGMENT_ASSEMBLY_DESCRIPTION
-
-
-
-# def get_base_assembly_schema(schema_key):
-#     schema_dict = {
-#         '2bb' : chem_assembly.ASSEMBLY_SCHEMA_2BB,
-#         '3bb' : chem_assembly.ASSEMBLY_SCHEMA_3BB
-#     }
-
-#     schema = schema_dict.get(schema_key, None)
-
-#     if schema is None:
-#         raise HTTPException(status_code=404, detail=f"template {template_id} not found")
-
-#     return schema
-
-# def strip_assembly_schema_crud(assembly_schema):
-
-#     assembly_schema = chem_assembly.strip_assembly_schema(assembly_schema.dict())
-
-#     return assembly_schema 
 
 
 
