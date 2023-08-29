@@ -1,3 +1,5 @@
+import json 
+
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import Descriptors
@@ -8,6 +10,16 @@ from rdkit.Chem.Lipinski import RotatableBondSmarts
 
 from chem_templates.filter import Filter, RangeFunctionFilter, CatalogFilter, FilterResult, Template, SimpleSmartsFilter
 from chem_templates.chem import Molecule, Catalog
+from chem_templates.utils import flatten_list, deduplicate_list
+from chem_templates.building_blocks import REACTION_GROUP_DICT, Synthon, molecule_to_synthon, ReactionUniverse 
+from chem_templates.assembly import (
+                                    build_assembly_from_dict, 
+                                    AssemblyInputs, 
+                                    SynthonPool, 
+                                    AssemblyPool,
+                                    build_synthesis_scheme, 
+                                    build_fragment_assembly_scheme
+                                    )
 
 def to_mol(smile):
     try:
@@ -291,3 +303,210 @@ BASE_TEMPLATE = {
                         'example_smarts' : {'min_val' : None, 'max_val' : None},
                         }
 }
+
+
+REACTION_MECHANISM_DICT = {
+                        'O-acylation' : True,
+                        'Olefination' : True,
+                        'Condensation_of_Y-NH2_with_carbonyl_compounds' : True,
+                        'Amine_sulphoacylation' : True,
+                        'C-C couplings' : True,
+                        'Radical_reactions' : True,
+                        'N-acylation' : True,
+                        'O-alkylation_arylation' : True,
+                        'Metal organics C-C bong assembling' : True,
+                        'S-alkylation_arylation' : True,
+                        'Alkylation_arylation_of_NH-lactam' : True,
+                        'Alkylation_arylation_of_NH-heterocycles' : True,
+                        'Amine_alkylation_arylation' : True
+                    }
+
+SYNTHON_NODE_SCHEMA = {
+                        'name' : '', 
+                        'node_type' : 'synthon_node', 
+                        'n_func' : [],
+                        'template_config' : None,
+                        'reaction_mechanisms' : REACTION_MECHANISM_DICT,
+                        'incoming_node' : None,
+                        'next_node' : None
+                    }
+
+SYNTHON_LEAF_NODE_SCHEMA = {
+                        'name' : '',
+                        'node_type' : 'synthon_leaf_node',
+                        'n_func' : [],
+                        'template_config' : None
+                    }
+
+FRAGMENT_NODE_SCHEMA = {
+                            'name' : '',
+                            'node_type' : 'fragment_node',
+                            'template_config' : None,
+                            'children' : []
+                        }
+
+FRAGMENT_LEAF_NODE_SCHEMA = {
+                                'name' : '',
+                                'node_type' : 'fragment_leaf_node',
+                                'mapping_idxs' : [],
+                                'template_config' : None
+                            }
+
+bb_assembly_overview = '''Building block assembly attempts to fuse building block compounds 
+based on a defined set of allowed reactions. Building block assemblies are made from 
+leaf nodes (`synthon_leaf_node`) and reaction nodes (`synthon_node`)
+
+leaf nodes have the following schema:
+
+{
+    'name' : '',
+    'node_type' : 'synthon_leaf_node',
+    'n_func' : [],
+    'template_config' : None
+}
+
+`n_func` is a list of integers defining how many reactive functional groups a building block 
+molecule is allowed to have
+
+`template_config` is an optional template for filtering building blocks
+
+reaction nodes have the following schema:
+
+{
+    'name' : '', 
+    'node_type' : 'synthon_node', 
+    'n_func' : [],
+    'template_config' : None,
+    'reaction_mechanisms' : {'C-C couplings' : True},
+    'incoming_node' : None,
+    'next_node' : None
+}
+
+`reaction_mechanisms` is a dictionary defining what reaction mechanisms are allowed. See the 
+node schema below for the full list.
+
+`incoming_node` and `next_node` are expected to be either leaf nodes or reaction nodes.
+
+Example:
+
+Here is an example schema for fusing two building blocks. 
+
+Note: all `name` attributes must be unique
+
+block1 = {
+            'name' : 'building_block_1',
+            'node_type' : 'synthon_leaf_node',
+            'n_func' : [1],
+            'template_config' : template_config_1
+        }
+
+block2 = {
+            'name' : 'building_block_2',
+            'node_type' : 'synthon_leaf_node',
+            'n_func' : [1],
+            'template_config' : template_config_2
+        }
+
+product = {
+            'name' : 'product', 
+            'node_type' : 'synthon_node', 
+            'n_func' : [0],
+            'template_config' : template_config_3,
+            'reaction_mechanisms' : {
+                                        'O-acylation' : True,
+                                        'Olefination' : True,
+                                        'Condensation_of_Y-NH2_with_carbonyl_compounds' : True,
+                                        'Amine_sulphoacylation' : True,
+                                        'C-C couplings' : True,
+                                        'Radical_reactions' : True,
+                                        'N-acylation' : True,
+                                        'O-alkylation_arylation' : True,
+                                        'Metal organics C-C bong assembling' : True,
+                                        'S-alkylation_arylation' : True,
+                                        'Alkylation_arylation_of_NH-lactam' : True,
+                                        'Alkylation_arylation_of_NH-heterocycles' : True,
+                                        'Amine_alkylation_arylation' : True
+                                    },
+            'incoming_node' : block1,
+            'next_node' : block2
+        }
+'''
+
+BUILDING_BLOCK_ASSEMBLY_DESCRIPTION = {
+    'overview' : bb_assembly_overview,
+    'leaf_node_schema' : SYNTHON_LEAF_NODE_SCHEMA,
+    'node_schema' : SYNTHON_NODE_SCHEMA
+}
+
+
+fragment_assembly_overview = '''Fragment assembly attempts to fuse molecular fragments 
+based on dummy atom mapping. Fragment assemblies are made from leaf nodes 
+(`fragment_leaf_node`) and fusion nodes (`fragment_node`)
+
+leaf nodes have the following schema:
+
+{
+    'name' : '',
+    'node_type' : 'fragment_leaf_node',
+    'mapping_idxs' : [],
+    'template_config' : None
+}
+
+`mapping_idxs` is a list of ints defining the expected mapped dummy atoms. For example, 
+`mapping_idxs=[1,2]` would require fragments of the form `[*:1]R[*:2]`
+
+Fusion nodes have the following schema:
+
+{
+    'name' : '',
+    'node_type' : 'fragment_node',
+    'template_config' : None,
+    'children' : []
+}
+
+`children` is a list of `fragment_leaf_node` or `fragment_node` schemas that feed into 
+the fusion node.
+
+Example:
+
+Here is an example schema for fusing fragments in the form of `[scaffold]-[linker]-[r_group]` 
+
+Note: all `name` attributes must be unique
+
+
+r1_schema = {
+                'name' : 'R1',
+                'node_type' : 'fragment_leaf_node',
+                'mapping_idxs' : [1],
+                'template_config' : template_config_1
+            }
+
+linker_schema = {
+                'name' : 'linker',
+                'node_type' : 'fragment_leaf_node',
+                'mapping_idxs' : [1, 2],
+                'template_config' : template_config_2
+            }
+
+scaffold_schema = {
+                'name' : 'scaffold',
+                'node_type' : 'fragment_leaf_node',
+                'mapping_idxs' : [2],
+                'template_config' : template_config_3
+            }
+
+fused_molecule = {
+                    'name' : 'full_molecule',
+                    'node_type' : 'fragment_node',
+                    'template_config' : template_config_4,
+                    'children' : [r1_schema, linker_schema, scaffold_schema]
+                }
+'''
+
+
+FRAGMENT_ASSEMBLY_DESCRIPTION = {
+    'overview' : fragment_assembly_overview,
+    'leaf_node_schema' : FRAGMENT_LEAF_NODE_SCHEMA,
+    'node_schema' : FRAGMENT_NODE_SCHEMA
+}
+

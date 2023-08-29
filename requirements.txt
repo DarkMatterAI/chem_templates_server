@@ -6,4 +6,4 @@ motor
 beanie
 pytest
 httpx
-chem_templates
+chem_templates==0.0.7

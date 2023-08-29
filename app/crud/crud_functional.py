@@ -10,12 +10,12 @@ def get_base_template():
     return chem_templates.BASE_TEMPLATE
 
 def strip_template_crud(template_config: schemas.TemplateConfig):
-    return chem_templates.strip_template(template_config.dict()) 
+    return chem_templates.strip_template(template_config.model_dump()) 
 
 async def eval_template_functional(eval_request: schemas.TemplateEvalRequestFunctional, return_data: bool):
 
     inputs = eval_request.inputs
-    template_config = eval_request.template_config.dict()
+    template_config = eval_request.template_config.model_dump()
 
     results = chem_templates.run_request(inputs, template_config, return_data=return_data)
     

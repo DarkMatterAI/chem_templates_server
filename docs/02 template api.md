@@ -1,12 +1,3 @@
-# Usage
-
-Overview on using the server
-
-## API docs
-
-API docs can be found at `http://{hostname}:{port}/docs`. For the default setup, this should be 
-`http://localhost:7861/docs`
-
 ## Templates Overview
 
 Templates have three categories of filter:
@@ -60,13 +51,23 @@ A full JSON containing all available properties can be found at `/base_template`
 To validate a template and remove any unspecified filters, use the `/strip_template` endpoint.
 
 
-## Python Query
+## Template API
 
-Example of how to send queries to the server with the python `requests` library.
+`/filter_descriptions` - descriptions of available filters
+
+`/base_template` - template config showing all available filters
+
+`/strip_template` - strips a template config of unused filters
+
+`/eval_template_functional` - filters a set of `inputs` against a `template_config`
+
+Full API docs can be found at `http://{hostname}:{port}/docs`.
+
+Example of using the `eval_template_functional` with the python `requests` library 
 
 ```python
 import requests
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 def send_filter_request(inputs, template_config, return_data=True):
@@ -83,7 +84,7 @@ def send_filter_request_parallel(inputs, template_config, batch_size, n_concurre
     
     input_batches = [inputs[i:i+batch_size] for i in range(0, len(inputs), batch_size)]
     
-    with ThreadPool(n_concurrent) as p:
+    with ThreadPoolExecutor(n_concurrent) as p:
         func = partial(send_filter_request, template_config=template_config, return_data=return_data)
         results = p.map(func, input_batches)
         
@@ -133,3 +134,67 @@ results = send_filter_request_parallel(inputs, template_config, batch_size, n_co
 
 For best results, set `n_concurrent` to the number of workers the server has
 
+
+## Template Stateful API
+
+If a MongoDB connection is enabled, stateful endpoints supporting CRUD operations become available
+
+`/create_template` - create template
+
+`/get_template/{template_id}` - get template by ID
+
+`/scroll_templates` - scroll saved templates
+
+`/update_template/{template_id}` - update saved template
+
+`/delete_template/{template_id}` - delete saved template
+
+`/eval_template_stateful/{template_id}` - eval `inputs` against a saved template
+
+Full API docs can be found at `http://{hostname}:{port}/docs`.
+
+```python
+import requests
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
+template_config = {
+ "template_name": "my_template",
+ "property_filters": {
+  "LogP": {
+   "min_val": None,
+   "max_val": 5
+  },
+  "Molecular Weight": {
+   "min_val": None,
+   "max_val": 500
+  },
+  "Hydrogen Bond Donors": {
+   "min_val": None,
+   "max_val": 5
+  },
+  "Hydrogen Bond Acceptors": {
+   "min_val": None,
+   "max_val": 10
+  }
+ },
+ "catalog_filters": {
+  "PAINS": {
+   "include": True
+  },
+ },
+ "smarts_filters": {
+   "[F,Cl,Br]": {
+   "min_val": 1.0,
+   "max_val": 3.0
+  }
+ }
+}
+
+create_response = requests.post('http://localhost:7861/create_template', json=template_config)
+template_id = response.json()['_id']
+inputs = ...
+
+eval_response = requests.post(f'http://localhost:7861/eval_template_stateful/{template_id}',
+                                json={'inputs':inputs}, params={'return_data':True})
+```

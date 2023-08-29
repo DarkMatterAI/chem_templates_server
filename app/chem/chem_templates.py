@@ -182,11 +182,6 @@ def run_request(inputs, template_config, return_data=False):
                             return_data=return_data)
         results.append(result)
 
-    # results = [
-    #             eval_query(i, filters, template_config['template_name'], return_data=return_data) 
-    #             for i in inputs
-    #             ]
-
     elapsed = time.time() - start 
     print(f'finished eval of {len(inputs)} inputs in {elapsed} seconds')
     return results 
