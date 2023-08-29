@@ -22,6 +22,11 @@ docker-compose up -d --build
 docker-compose exec template_server app/tests/tests-start.sh
 ```
 
+## API docs
+
+API docs can be found at `http://{hostname}:{port}/docs`. For the default setup, this should be 
+`http://localhost:7861/docs`
+
 ## Connect to existing MongoDB database
 
 It is also possible to build just the template server and connect it to an existing MongoDB database
