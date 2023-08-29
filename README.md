@@ -24,5 +24,6 @@ The service is now running at port 7861, with API docs at `http://localhost:7861
 View the [docs](https://github.com/DarkMatterAI/chem_templates_server/tree/main/docs) directory for
 
 - [Setup](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/01%20setup.md)
-- [Usage](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/02%20usage.md)
+- [Template API](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/02%20template%20api.md)
+- [Assembly API](https://github.com/DarkMatterAI/chem_templates_server/blob/main/docs/03%20assembly%20api.md)
 
