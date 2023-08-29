@@ -10,11 +10,11 @@ COPY ./app /code/app
 
 RUN chmod +x /code/app/tests/tests-start.sh
 
-ENV PORT=7860
-ENV HOST=0.0.0.0
-ENV WORKERS=1
-ENV TIMEOUT=120
+ENV TEMPLATE_SERVER_PORT=7860
+ENV TEMPLATE_SERVER_HOST=0.0.0.0
+ENV TEMPLATE_SERVER_WORKERS=1
+ENV TEMPLATE_SERVER_TIMEOUT=120
 ENV MONGO_URI=
 ENV MONGO_DB_NAME=template_db
 
-CMD uvicorn app.main:app --host $HOST --port $PORT --workers $WORKERS --timeout-keep-alive $TIMEOUT
+CMD uvicorn app.main:app --host $TEMPLATE_SERVER_HOST --port $TEMPLATE_SERVER_PORT --workers $TEMPLATE_SERVER_WORKERS --timeout-keep-alive $TEMPLATE_SERVER_TIMEOUT

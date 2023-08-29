@@ -21,18 +21,18 @@ def get_rxn_mechanisms():
 
 async def assemble_2bbs(assembly_inputs: schemas.TwoBBAseemblyRequest):
 
-    results = chem_assembly.assemble_2bbs(assembly_inputs.dict())
+    results = chem_assembly.assemble_2bbs(assembly_inputs.model_dump())
     await asyncio.sleep(0.01)
     return results 
 
 async def assemble_3bbs(assembly_inputs: schemas.ThreeBBAseemblyRequest):
 
-    results = chem_assembly.assemble_3bbs(assembly_inputs.dict())
+    results = chem_assembly.assemble_3bbs(assembly_inputs.model_dump())
     await asyncio.sleep(0.01)
     return results 
 
 async def assemble_custom(assembly_inputs: schemas.CustomAssemblySchema, assembly_type):
-    results = chem_assembly.assemble_inputs(assembly_inputs.dict(), assembly_type)
+    results = chem_assembly.assemble_inputs(assembly_inputs.model_dump(), assembly_type)
     await asyncio.sleep(0.01)
     return results 
 
