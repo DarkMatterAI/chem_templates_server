@@ -6,6 +6,10 @@ from ..schemas import schemas_assembly as schemas
 
 router = APIRouter(default_response_class=responses.ORJSONResponse)
 
+@router.post("/building_block/has_synthon", response_model=list[schemas.HasSynthonResponse])
+async def compute_synthons_api(eval_request: schemas.HasSynthonRequest):
+    results = await crud.has_synthon(eval_request)
+    return results 
 
 @router.post("/building_block/compute_synthons", response_model=list[schemas.ComputeSynthonResponse])
 async def compute_synthons_api(eval_request: schemas.ComputeSynthonRequest):

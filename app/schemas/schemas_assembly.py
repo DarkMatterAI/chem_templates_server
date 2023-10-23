@@ -3,6 +3,15 @@ from pydantic import BaseModel
 
 from .schemas_common import TemplateConfig
 
+class HasSynthonRequest(BaseModel):
+    inputs: list[str]
+
+class HasSynthonResponse(BaseModel):
+    input: str 
+    index: int 
+    valid_input: bool 
+    has_synthon: bool 
+
 class ComputeSynthonRequest(BaseModel):
     inputs: list[str]
 

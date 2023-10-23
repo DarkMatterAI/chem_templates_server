@@ -2,7 +2,8 @@ from .chem_imports import *
 from .chem_templates import strip_template, build_filters
 from chem_templates.building_blocks import (
                                             smile_to_synthon,
-                                            REACTION_GROUP_NAMES
+                                            REACTION_GROUP_NAMES,
+                                            BBClassifier
                                             )
 from collections import defaultdict 
 
@@ -26,6 +27,28 @@ SCHEMA_REMAPPING_FUNCTIONS = {
     'next_node' : lambda k,v: (k, convert_assembly_schema(v)),
     'children' : lambda k,v: (k, [convert_assembly_schema(i) for i in v])
 }
+
+def has_synthon(inputs):
+    results = []
+    for i, item in enumerate(inputs):
+        result = {
+            'input' : item,
+            'index' : i,
+            'valid_input' : None,
+            'has_synthon' : False 
+        }
+        mol = to_mol(item)
+        if mol is None:
+            result['valid_input'] = False
+            result['has_synthon'] = False
+        else:
+            classes = BBClassifier(mol=mol)
+            result['valid_input'] = True
+            result['has_synthon'] = bool(classes)
+
+        results.append(result)
+
+    return results 
 
 def compute_synthons(inputs):
     results = []

@@ -3,18 +3,11 @@ version: '3.8'
 services:
 
   template_server:
-    image: dmaichem/chem_templates_server
-    # build: .
+    # image: dmaichem/chem_templates_server
+    build: .
     ports:
-      - 7861:7861
-    environment:
-      - TEMPLATE_SERVER_PORT=7861
-      - TEMPLATE_SERVER_HOST=0.0.0.0
-      - TEMPLATE_SERVER_WORKERS=1
-      - TEMPLATE_SERVER_TIMEOUT=120
-      - MONGO_URI=mongodb://mongo:27017
-      - MONGO_DB_NAME=template_db
+      - ${TEMPLATE_SERVER_PORT}:${TEMPLATE_SERVER_PORT}
+    env_file: .env
 
   mongo:
     image: mongo
-  

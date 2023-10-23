@@ -19,6 +19,6 @@ async def eval_template_functional(eval_request: schemas.TemplateEvalRequestFunc
 
     results = chem_templates.run_request(inputs, template_config, return_data=return_data)
     
-    await asyncio.sleep(0.01)
+    await asyncio.sleep(0)
 
     return results
