@@ -35,16 +35,16 @@ def has_synthon(inputs):
             'input' : item,
             'index' : i,
             'valid_input' : None,
-            'has_synthon' : False 
+            'result' : False 
         }
         mol = to_mol(item)
         if mol is None:
             result['valid_input'] = False
-            result['has_synthon'] = False
+            result['result'] = False
         else:
             classes = BBClassifier(mol=mol)
             result['valid_input'] = True
-            result['has_synthon'] = bool(classes)
+            result['result'] = bool(classes)
 
         results.append(result)
 

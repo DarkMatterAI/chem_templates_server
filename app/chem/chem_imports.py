@@ -11,7 +11,14 @@ from rdkit.Chem.Lipinski import RotatableBondSmarts
 from chem_templates.filter import Filter, RangeFunctionFilter, CatalogFilter, FilterResult, Template, SimpleSmartsFilter
 from chem_templates.chem import Molecule, Catalog
 from chem_templates.utils import flatten_list, deduplicate_list
-from chem_templates.building_blocks import REACTION_GROUP_DICT, Synthon, molecule_to_synthon, ReactionUniverse 
+from chem_templates.building_blocks import (
+                                            REACTION_GROUP_DICT, 
+                                            Synthon, 
+                                            molecule_to_synthon, 
+                                            ReactionUniverse,
+                                            BBClassifier
+                                            )
+
 from chem_templates.assembly import (
                                     build_assembly_from_dict, 
                                     AssemblyInputs, 
@@ -88,6 +95,9 @@ def num_compounds(mol):
     smile = Chem.MolToSmiles(mol)
     return smile.count('.')+1
 
+def num_synthon_classes(mol):
+    classes = BBClassifier(mol=mol)
+    return len(classes)
 
 PROP_FUNCS = {
     'Number of Compounds' : num_compounds,
@@ -133,7 +143,9 @@ PROP_FUNCS = {
     'QED' : QED.qed,
     'SA Score' : sascorer.calculateScore,
     'Molar Refractivity' : Descriptors.MolMR,
-    'Radical Count' : Descriptors.NumRadicalElectrons
+    'Radical Count' : Descriptors.NumRadicalElectrons,
+
+    'Number of Synthon Classes' : num_synthon_classes
 }
 
 PROPERTY_NAMES = list(PROP_FUNCS.keys())
@@ -202,7 +214,9 @@ property_function_descriptions = {
     'QED' : "computes the QED score of the input",
     'SA Score' : "computes the SA score of the input",
     'Molar Refractivity' : "computes the molar refractivity of the input",
-    'Radical Count' : "counts the number of radical electrons in the input"
+    'Radical Count' : "counts the number of radical electrons in the input",
+
+    'Number of Synthon Classes' : "counts the number of synthon classes in the input. An efficient way to check if the input has valid synthons"
 }
 
 catalog_filter_description = '''catalog filters compare the input structure 
@@ -289,6 +303,7 @@ BASE_TEMPLATE = {
                         "SA Score" :                        {'min_val' : None, 'max_val' : None},
                         "Molar Refractivity" :              {'min_val' : None, 'max_val' : None},
                         "Radical Count" :                   {'min_val' : None, 'max_val' : None},
+                        "Number of Synthon Classes" :       {'min_val' : None, 'max_val' : None},
                         },
     'catalog_filters' : {
                         "PAINS" : {'include' : False},

@@ -10,7 +10,7 @@ class HasSynthonResponse(BaseModel):
     input: str 
     index: int 
     valid_input: bool 
-    has_synthon: bool 
+    result: bool 
 
 class ComputeSynthonRequest(BaseModel):
     inputs: list[str]
