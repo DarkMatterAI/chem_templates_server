@@ -99,8 +99,14 @@ def num_synthon_classes(mol):
     classes = BBClassifier(mol=mol)
     return len(classes)
 
+def num_dummies(mol):
+    smile = Chem.MolToSmiles(mol)
+    n_attachments = smile.count('*')
+    return n_attachments
+
 PROP_FUNCS = {
     'Number of Compounds' : num_compounds,
+    'Number of Dummy Atoms' : num_dummies,
     'TPSA' : rdMolDescriptors.CalcTPSA,
     'LogP' : Descriptors.MolLogP,
     
@@ -172,6 +178,7 @@ property filter is ignored
 
 property_function_descriptions = {
     'Number of Compounds' : "counts the number of compounds in the input, denoted by `.` separation",
+    'Number of Dummy Atoms' : "Number of dummy atoms (*)",
     'TPSA' : "TPSA value for the input",
     'LogP' : "cLogP for the input",
     
@@ -269,6 +276,7 @@ BASE_TEMPLATE = {
     'template_name' : None,
     'property_filters' : {
                         "Number of Compounds" :             {'min_val' : None, 'max_val' : None},
+                        "Number of Dummy Atoms" :           {'min_val' : None, 'max_val' : None},
                         "TPSA" :                            {'min_val' : None, 'max_val' : None},
                         "LogP" :                            {'min_val' : None, 'max_val' : None},
                         "Molecular Weight" :                {'min_val' : None, 'max_val' : None},
