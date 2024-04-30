@@ -17,4 +17,9 @@ ENV TEMPLATE_SERVER_TIMEOUT=120
 ENV MONGO_URI=
 ENV MONGO_DB_NAME=template_db
 
+COPY entrypoint.sh /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
+ENTRYPOINT ["/code/entrypoint.sh"]
+
 CMD uvicorn app.main:app --host $TEMPLATE_SERVER_HOST --port $TEMPLATE_SERVER_PORT --workers $TEMPLATE_SERVER_WORKERS --timeout-keep-alive $TEMPLATE_SERVER_TIMEOUT
